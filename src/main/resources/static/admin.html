@@ -6,38 +6,87 @@
   <meta name="theme-color" content="#f2f6f7">
   <title>Кабинет администратора · Окошко</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="/theme.js"></script>
   <style>
     :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#19232e;background:#eef3f5;font-synthesis:none;--accent:#168c96;--muted:#687780;--line:#e4eaed}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh}.shell{width:min(100%,920px);min-height:100vh;margin:auto;padding:24px 22px 56px;background:#f8fafb}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh}.shell{width:min(100%,920px);min-height:100vh;margin:auto;padding:24px clamp(16px, 5vw, 32px) 56px;background:#f8fafb}
     .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}.brand{font-size:13px;font-weight:850;letter-spacing:.11em;color:var(--accent)}.back{color:var(--accent);font-size:14px;font-weight:700;text-decoration:none}
-    .eyebrow{margin:0 0 7px;color:#85939b;font-size:11px;font-weight:800;letter-spacing:.1em}h1{margin:0 0 8px;font-size:30px;letter-spacing:-.045em}.subtitle{margin:0 0 23px;color:var(--muted);font-size:14px}
-    .tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 16px}.tab{flex:0 0 auto;padding:10px 16px;border:1px solid #dfe7ea;border-radius:999px;background:white;color:#475760;font:inherit;font-size:13px;font-weight:750;text-decoration:none}.tab.primary{border-color:var(--accent);background:var(--accent);color:white}
-    .section{padding-top:4px;margin:12px 0 30px;scroll-margin-top:15px}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 11px}.section-title h2{margin:0;font-size:19px}.count{padding:5px 9px;border-radius:999px;background:#e9eff1;color:#61717a;font-size:11px;font-weight:800}
-    .list{display:grid;gap:10px}.card{padding:17px;border:1px solid var(--line);border-radius:20px;background:white;box-shadow:0 7px 20px #263d490b}.request{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:15px}.card h3{margin:0 0 7px;font-size:16px}.meta{color:var(--muted);font-size:12px;line-height:1.55}.badge{display:inline-flex;margin-top:8px;padding:5px 10px;border-radius:999px;background:#fff3d6;color:#795600;font-size:11px;font-weight:800}.badge.approved{background:#e0f3e9;color:#17613d}.badge.rejected{background:#ffebea;color:#9d2a21}
-    .actions{display:flex;gap:7px}.action,.role-button{padding:10px 12px;border:0;border-radius:11px;background:#e5f4f5;color:#176b73;font:inherit;font-size:12px;font-weight:750}.action.reject{background:#f6eceb;color:#8b3f38}.person{display:flex;align-items:center;justify-content:space-between;gap:15px}.person strong{display:block;font-size:14px}.person small{display:block;margin-top:4px;color:var(--muted);font-size:12px}.role-button{background:#eff2f4;color:#4f5e67;white-space:nowrap}
-    .student-group{margin:12px 0 18px}.student-group h3{margin:0 0 8px;color:#61717a;font-size:13px}.note{margin-top:20px;padding:14px;border-radius:15px;background:#edf4f5;color:#4c5e65;font-size:12px;line-height:1.5}
-    @media(max-width:620px){.shell{padding:20px 16px 40px}.request{grid-template-columns:1fr}.actions{justify-content:flex-start}.actions .action{flex:1}.top{margin-bottom:24px}h1{font-size:27px}}
+    h1{margin:0 0 20px;font-size:clamp(1.75rem,4vw,2rem);font-weight:800;line-height:1.15;letter-spacing:-.04em}
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 8px;
+      margin: 0 0 20px;
+      --filter-surface: #d7edf7;
+      --filter-text: #174860;
+      --filter-active: #1d6e9d;
+      --filter-active-text: #fff;
+    }
+    .theme-dark .tabs {
+      --filter-surface: #263e53;
+      --filter-text: #d2ebfa;
+      --filter-active: #8dd1f6;
+      --filter-active-text: #102a3a;
+    }
+    .tab {
+      position: relative;
+      isolation: isolate;
+      min-height: 44px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--filter-text);
+      font: inherit;
+      font-size: .8125rem;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .tab::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 5px 0;
+      border-radius: inherit;
+      background: var(--filter-surface);
+    }
+    .tab[aria-pressed="true"] { color: var(--filter-active-text); }
+    .tab[aria-pressed="true"]::before { background: var(--filter-active); }
+    .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+    @media (forced-colors: active) {
+      .tab::before { border: 1px solid ButtonText; }
+      .tab[aria-pressed="true"]::before { border-width: 3px; }
+    }
+    .section{margin:0 0 28px}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}.section-title h2{margin:0;font-size:20px;font-weight:800}.count{padding:5px 9px;border-radius:999px;background:#e9eff1;color:#61717a;font-size:11px;font-weight:800}
+    .list{display:grid;gap:12px}.card{padding:16px;border:1px solid var(--line);border-radius:20px;background:white;box-shadow:0 7px 20px #263d490b}.request{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:15px}.card h3{margin:0 0 7px;font-size:16px}.meta{color:var(--muted);font-size:12px;line-height:1.55}.badge{display:inline-flex;margin-top:8px;padding:5px 10px;border-radius:999px;background:#fff3d6;color:#795600;font-size:11px;font-weight:800}.badge.approved{background:#e0f3e9;color:#17613d}.badge.rejected{background:#ffebea;color:#9d2a21}
+    .actions{display:flex;gap:7px}.action,.role-button{min-height:44px;padding:10px 12px;border:0;border-radius:11px;background:#e5f4f5;color:#176b73;font:inherit;font-size:12px;font-weight:750}.action.reject{background:#f6eceb;color:#8b3f38}.person{display:flex;align-items:center;justify-content:space-between;gap:15px}.person strong{display:block;font-size:14px}.person small{display:block;margin-top:4px;color:var(--muted);font-size:12px}.role-button{background:#eff2f4;color:#4f5e67;white-space:nowrap}
+    .note{margin-top:20px;padding:14px;border-radius:15px;background:#edf4f5;color:#4c5e65;font-size:12px;line-height:1.5}
+    .note:empty{display:none}
+    @media(max-width:620px){.shell{padding-block:20px 40px}.request{grid-template-columns:1fr}.actions{justify-content:flex-start}.actions .action{flex:1}.top{margin-bottom:24px}}
   </style>
+<link rel="stylesheet" href="/secondary-theme.css">
 </head>
 <body>
   <main class="shell">
-    <header class="top"><span class="brand">ОКОШКО</span><a class="back" href="/app">‹ В приложение</a></header>
-    <p class="eyebrow">АДМИНИСТРИРОВАНИЕ</p>
-    <h1>Личный кабинет администратора</h1>
-    <p class="subtitle">Заявки и пользователи школы</p>
-    <nav class="tabs" aria-label="Разделы кабинета">
-      <a class="tab primary" href="#requests">Заявки</a><a class="tab" href="#admins">Админы</a><a class="tab" href="#teachers">Учителя</a><a class="tab" href="#students">Ученики</a>
-    </nav>
+    <header class="top"><span class="brand">ОКОШКО</span><a class="back" href="/app">Готово</a></header>
+    <h1>Кабинет администратора</h1>
+    <div class="tabs" role="group" aria-label="Категории">
+      <button class="tab" type="button" data-filter="all" aria-pressed="true" aria-controls="requests admins teachers students">Все</button>
+      <button class="tab" type="button" data-filter="requests" aria-pressed="false" aria-controls="requests">Заявки</button>
+      <button class="tab" type="button" data-filter="admins" aria-pressed="false" aria-controls="admins">Админы</button>
+      <button class="tab" type="button" data-filter="teachers" aria-pressed="false" aria-controls="teachers">Учителя</button>
+      <button class="tab" type="button" data-filter="students" aria-pressed="false" aria-controls="students">Ученики</button>
+    </div>
     <section class="section" id="requests">
       <div class="section-title"><h2>Заявки</h2><span class="count" id="request-count">2</span></div>
       <div class="list" id="request-list" aria-live="polite">
-        <article class="card request"><div><h3>Заявка №42</h3><div class="meta">Демо Ученик<br>Группа A1 · 6 ноября 2026</div><span class="badge">Ожидает решения</span></div><div class="actions"><button class="action" data-demo-status="approved" type="button">Одобрить</button><button class="action reject" data-demo-status="rejected" type="button">Отклонить</button></div></article>
-        <article class="card request"><div><h3>Заявка №41</h3><div class="meta">Тестовый Ученик<br>Группа A2 · 5 ноября 2026</div><span class="badge approved">Одобрена · демо</span></div></article>
+        <article class="card request"><div><h3>Заявка №42</h3><div class="meta">Ученик<br>Группа A1 · 6 ноября 2026</div><span class="badge">Ожидает решения</span></div><div class="actions"><button class="action" data-request-status="approved" type="button">Одобрить</button><button class="action reject" data-request-status="rejected" type="button">Отклонить</button></div></article>
+        <article class="card request"><div><h3>Заявка №41</h3><div class="meta">Ученик<br>Группа A2 · 5 ноября 2026</div><span class="badge approved">Одобрена</span></div></article>
       </div>
     </section>
     <section class="section" id="admins">
       <div class="section-title"><h2>Админы</h2><span class="count">2</span></div>
-      <div class="list"><article class="card person"><div><strong>Демо Администратор</strong><small>Telegram ID ·•••• 1842 · Роль: admin</small></div><button class="role-button" type="button">Изменить роль</button></article><article class="card person"><div><strong>Демо Учитель</strong><small>Telegram ID ·•••• 6290 · Роли: admin, teacher</small></div><button class="role-button" type="button">Изменить роль</button></article></div>
+      <div class="list"><article class="card person"><div><strong>Администратор</strong><small>Telegram ID ·•••• 1842 · Роль: admin</small></div><button class="role-button" type="button">Изменить роль</button></article><article class="card person"><div><strong>Учитель</strong><small>Telegram ID ·•••• 6290 · Роли: admin, teacher</small></div><button class="role-button" type="button">Изменить роль</button></article></div>
     </section>
     <section class="section" id="teachers">
       <div class="section-title"><h2>Учителя</h2><span class="count">2</span></div>
@@ -45,12 +94,39 @@
     </section>
     <section class="section" id="students">
       <div class="section-title"><h2>Ученики</h2><span class="count">2</span></div>
-      <div class="student-group"><h3>Анна Смирнова · Вторник и четверг, 18:30 · группа A1</h3><div class="list"><article class="card person"><div><strong>Ученик группы A1</strong><small>6 участников в группе · Роль: USER</small></div><button class="role-button" type="button">Изменить роль</button></article></div></div>
-      <div class="student-group"><h3>Елена Иванова · Понедельник и среда, 17:00 · группа A2</h3><div class="list"><article class="card person"><div><strong>Ученик группы A2</strong><small>5 участников в группе · Роль: USER</small></div><button class="role-button" type="button">Изменить роль</button></article></div></div>
+      <div class="list">
+        <article class="card person">
+          <div>
+            <strong>Анна Смирнова</strong>
+            <small>Ученик группы A1</small>
+            <small>Вторник и четверг, 18:30</small>
+            <small>6 участников в группе · Роль: USER</small>
+          </div>
+          <button class="role-button" type="button">Изменить роль</button>
+        </article>
+        <article class="card person">
+          <div>
+            <strong>Елена Иванова</strong>
+            <small>Ученик группы A2</small>
+            <small>Понедельник и среда, 17:00</small>
+            <small>5 участников в группе · Роль: USER</small>
+          </div>
+          <button class="role-button" type="button">Изменить роль</button>
+        </article>
+      </div>
     </section>
-    <p class="note" id="admin-mode-note">Режим просмотра UI · тестовые данные. Кнопки меняют только состояние макета и не сохраняют данные в базе.</p>
+    <p class="note" id="admin-mode-note"></p>
   </main>
 <script>
+  const filters = document.querySelectorAll(".tab[data-filter]");
+  const sections = document.querySelectorAll(".shell > .section");
+  filters.forEach((button) => button.addEventListener("click", () => {
+    filters.forEach((filter) => filter.setAttribute("aria-pressed", String(filter === button)));
+    sections.forEach((section) => {
+      section.hidden = button.dataset.filter !== "all" && button.dataset.filter !== section.id;
+    });
+  }));
+
   const requestList = document.querySelector("#request-list");
   const requestCount = document.querySelector("#request-count");
   const initData = window.Telegram?.WebApp?.initData || "";
@@ -58,10 +134,10 @@
   const statusLabels = { pending: "Ожидает решения", approved: "Одобрена", rejected: "Отклонена" };
 
   document.querySelectorAll(".request").forEach((request) => {
-    request.querySelectorAll("[data-demo-status]").forEach((button) => button.addEventListener("click", () => {
-      const status = button.dataset.demoStatus;
+    request.querySelectorAll("[data-request-status]").forEach((button) => button.addEventListener("click", () => {
+      const status = button.dataset.requestStatus;
       const badge = request.querySelector(".badge");
-      badge.textContent = `${statusLabels[status]} · демо`;
+      badge.textContent = statusLabels[status];
       badge.className = `badge ${status}`;
       request.querySelector(".actions").remove();
     }));
@@ -69,7 +145,7 @@
   document.querySelectorAll(".role-button").forEach((button) => button.addEventListener("click", () => {
     const active = button.dataset.changed === "true";
     button.dataset.changed = String(!active);
-    button.textContent = active ? "Изменить роль" : "Роль изменена · демо";
+    button.textContent = active ? "Изменить роль" : "Роль изменена";
     button.setAttribute("aria-pressed", String(!active));
   }));
 

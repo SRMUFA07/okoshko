@@ -1,0 +1,30 @@
+/* Solar Linear icons from the supplied Solar Icon Set by 480 Design. */
+.solar-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  background-color: currentColor;
+  -webkit-mask: var(--solar-image) center / contain no-repeat;
+  mask: var(--solar-image) center / contain no-repeat;
+  vertical-align: middle;
+}
+
+.solar-icon--teachers { --solar-image: url("/icons/solar/teachers.svg"); }
+.solar-icon--account { --solar-image: url("/icons/solar/account.svg"); }
+.solar-icon--settings { --solar-image: url("/icons/solar/settings.svg"); }
+.solar-icon--sun { --solar-image: url("/icons/solar/sun.svg"); }
+.solar-icon--moon { --solar-image: url("/icons/solar/moon.svg"); }
+.solar-icon--monitor { --solar-image: url("/icons/solar/monitor.svg"); }
+.solar-icon--forward { --solar-image: url("/icons/solar/forward.svg"); }
+.solar-icon--back { --solar-image: url("/icons/solar/back.svg"); }
+
+.solar-icon--forward,
+.solar-icon--back {
+  width: 16px;
+  height: 16px;
+}
+
+@media (forced-colors: active) {
+  .solar-icon { background-color: CanvasText; forced-color-adjust: none; }
+}

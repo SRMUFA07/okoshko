@@ -25,8 +25,8 @@ public class SessionController {
 	@PostMapping
 	public SessionResponse open(
 			@RequestHeader(name = "X-Telegram-Init-Data", required = false) String initData) {
-		long telegramId = initDataVerifier.verifyAndGetTelegramUserId(initData);
-		return service.open(telegramId);
+		TelegramInitDataVerifier.TelegramUser telegramUser = initDataVerifier.verifyAndGetTelegramUser(initData);
+		return service.open(telegramUser);
 	}
 
 	@PutMapping("/notifications")

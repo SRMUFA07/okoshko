@@ -2,14 +2,18 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f2f6f7"><title>Кабинет учителя · Окошко</title>
-<style>
-:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#19232e;background:#eef3f5;font-synthesis:none;--accent:#168c96;--muted:#687780;--line:#e6edef}*{box-sizing:border-box}body{margin:0;min-height:100vh}.shell{width:min(100%,760px);min-height:100vh;margin:auto;padding:24px 20px 48px;background:#f8fafb}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}.brand{font-size:13px;font-weight:850;letter-spacing:.11em;color:var(--accent)}a{color:inherit}.back{color:var(--accent);font-size:14px;font-weight:700;text-decoration:none}.eyebrow{margin:0 0 7px;color:#85939b;font-size:11px;font-weight:800;letter-spacing:.1em}h1{margin:0 0 8px;font-size:29px;letter-spacing:-.04em}.hint{margin:0 0 22px;color:var(--muted);font-size:14px}.card{margin:12px 0;padding:20px;border:1px solid var(--line);border-radius:22px;background:white;box-shadow:0 8px 22px #263d490d}.card h2{margin:0 0 6px;font-size:18px}.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.form{display:grid;gap:16px;margin-top:18px}.form label{display:grid;gap:7px;color:#5c6b74;font-size:12px;font-weight:750}.form input,.form textarea{width:100%;padding:13px;border:1px solid #dce5e8;border-radius:13px;background:#fff;color:#19232e;font:inherit;font-size:15px}.form textarea{min-height:100px;resize:vertical}.save{padding:14px;border:0;border-radius:999px;background:#168c96;color:white;font:inherit;font-weight:750}.notice{margin-top:18px;padding:14px;border-radius:16px;background:#edf4f5;color:#4c5e65;font-size:12px;line-height:1.5}
-</style></head><body><main class="shell"><header class="top"><span class="brand">ОКОШКО</span><a class="back" href="/app">‹ В приложение</a></header><p class="eyebrow">КАБИНЕТ УЧИТЕЛЯ</p><h1>Мои занятия</h1><p class="hint">Группы, ссылка на урок и домашние задания</p>
+<script src="/theme.js"></script>
+  <style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#19232e;background:#eef3f5;font-synthesis:none;--accent:#168c96;--muted:#687780;--line:#e6edef}*{box-sizing:border-box}body{margin:0;min-height:100vh}.shell{width:min(100%,760px);min-height:100vh;margin:auto;padding:24px clamp(16px, 5vw, 24px) 48px;background:#f8fafb}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}.brand{font-size:13px;font-weight:850;letter-spacing:.11em;color:var(--accent)}a{color:inherit}.back{color:var(--accent);font-size:14px;font-weight:700;text-decoration:none}h1{margin:0 0 20px;font-size:clamp(1.75rem,4vw,2rem);font-weight:800;line-height:1.15;letter-spacing:-.04em}.hint{margin:0 0 22px;color:var(--muted);font-size:14px}.card{margin:12px 0;padding:20px;border:1px solid var(--line);border-radius:22px;background:white;box-shadow:0 8px 22px #263d490d}.card h2{margin:0 0 6px;font-size:18px}.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.form{display:grid;gap:16px;margin-top:20px}.save{padding:14px;border:0;border-radius:999px;background:#168c96;color:white;font:inherit;font-weight:750}.notice{margin-top:18px;padding:14px;border-radius:16px;background:#edf4f5;color:#4c5e65;font-size:12px;line-height:1.5}
+.notice:empty{display:none}
+</style>
+<link rel="stylesheet" href="/secondary-theme.css">
+<link rel="stylesheet" href="/forms.css"></head><body><main class="shell"><header class="top"><span class="brand">ОКОШКО</span><a class="back" href="/app">Готово</a></header><h1>Кабинет учителя</h1>
 <div id="workspace-content">
 <section class="card"><h2>Группа A1</h2><p>Вторник и четверг · 18:30 · начальный уровень</p><div class="form"><label>Ссылка на урок<input id="lesson-url" type="url" value="https://example.org/lesson/a1"></label><label>Домашнее задание<textarea id="homework">Workbook, Unit 4: упражнения 2, 3 и 5. Подготовить к четвергу.</textarea></label><button class="save" id="save-teacher-settings" type="button">Сохранить изменения</button><p id="save-status" class="hint" aria-live="polite"></p></div></section>
 <section class="card"><h2>Группа A2</h2><p>Понедельник и среда · 17:00 · базовый уровень</p><p style="margin-top:12px">Домашнее задание: повторить лексику Unit 3.</p></section>
 <section class="card"><h2>Расписание</h2><p>Понедельник, среда · 17:00 · группа A2</p><p style="margin-top:7px">Вторник, четверг · 18:30 · группа A1</p></section>
-</div><p class="notice" id="workspace-notice">Режим просмотра UI · тестовые данные. Изменения формы сохраняются только в браузере.</p></main>
+</div><p class="notice" id="workspace-notice"></p></main>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
   const lessonUrl = document.querySelector("#lesson-url");
@@ -238,7 +242,7 @@
   } else {
     document.querySelector("#save-teacher-settings").addEventListener("click", () => {
       localStorage.setItem("okoshko-teacher-preview", JSON.stringify({ lessonUrl: lessonUrl.value, homework: homework.value }));
-      status.textContent = "Сохранено в режиме просмотра на этом устройстве";
+      status.textContent = "Сохранено на этом устройстве";
     });
   }
 </script></body></html>

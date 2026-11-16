@@ -39,3 +39,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local tooling ###
+/AGENTS.md
+/skills/
+/.playwright-cli/

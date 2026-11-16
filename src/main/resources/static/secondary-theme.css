@@ -1,0 +1,59 @@
+:root.theme-dark {
+  color-scheme: dark;
+  color: #f1f4f5;
+  background: #11161a;
+  --accent: #77d6dd;
+  --muted: #b4bec4;
+  --line: #354149;
+}
+
+.theme-dark .shell,
+.theme-dark .consent-page {
+  background: #151b20;
+  color: #f1f4f5;
+}
+
+.theme-dark .card,
+.theme-dark .document {
+  background: #20282e;
+  border-color: var(--line);
+  color: #f1f4f5;
+}
+
+.theme-dark .consent-page p {
+  color: var(--muted);
+}
+
+.theme-dark .consent-page a {
+  color: var(--accent);
+}
+
+.theme-dark .save {
+  background: var(--accent);
+  color: #10202d;
+}
+
+.theme-dark .count,
+.theme-dark .role-button,
+.theme-dark .note,
+.theme-dark .notice {
+  background: #29343c;
+  color: #d0d8dc;
+}
+
+.theme-dark .action,
+.theme-dark .badge.approved {
+  background: #20413a;
+  color: #a7e5cf;
+}
+
+.theme-dark .action.reject,
+.theme-dark .badge.rejected {
+  background: #482c2d;
+  color: #ffc2bc;
+}
+
+.theme-dark .badge {
+  background: #473b23;
+  color: #ffe1a0;
+}

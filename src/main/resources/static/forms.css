@@ -1,0 +1,103 @@
+:root {
+  --field-surface: #f4f7f8;
+  --field-border: #97a8af;
+  --field-text: #202a33;
+  --field-label: #46545e;
+  --field-focus: #19838c;
+  --field-ring: #39b3bd30;
+  --checkbox-fill: #19838c;
+  --checkbox-mark: #fff;
+}
+
+.theme-dark {
+  color-scheme: dark;
+  --field-surface: #1b2329;
+  --field-border: #71848e;
+  --field-text: #f1f4f5;
+  --field-label: #c1cbcf;
+  --field-focus: #77d6dd;
+  --checkbox-fill: #77d6dd;
+  --checkbox-mark: #10202d;
+}
+
+.high-contrast {
+  --field-focus: var(--accent);
+  --field-border: var(--field-label);
+}
+
+.request-form label:not(.consent-card),
+.form label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: var(--field-label);
+  font-size: .875rem;
+  font-weight: 650;
+}
+
+.request-form input:not([type="checkbox"]),
+.form input,
+.form textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--field-border);
+  border-radius: 14px;
+  background: var(--field-surface);
+  color: var(--field-text);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.form textarea { min-height: 104px; resize: vertical; }
+
+.request-form input:not([type="checkbox"]):focus,
+.form input:focus,
+.form textarea:focus {
+  border-color: var(--field-focus);
+  outline: 2px solid var(--field-focus);
+  outline-offset: -1px;
+  box-shadow: 0 0 0 4px var(--field-ring);
+}
+
+.rounded-checkbox {
+  appearance: none;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  margin: 0;
+  border: 1.5px solid var(--field-border);
+  border-radius: 9px;
+  background: var(--field-surface);
+  cursor: pointer;
+}
+
+.rounded-checkbox:checked {
+  border-color: var(--checkbox-fill);
+  background: var(--checkbox-fill);
+}
+
+.rounded-checkbox:checked::after {
+  content: "";
+  width: 6px;
+  height: 11px;
+  margin-top: -2px;
+  border: solid var(--checkbox-mark);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.rounded-checkbox:focus-visible {
+  outline: 2px solid var(--field-focus);
+  outline-offset: 3px;
+}
+
+@media (forced-colors: active) {
+  .rounded-checkbox { appearance: auto; }
+  .rounded-checkbox:checked::after { display: none; }
+}

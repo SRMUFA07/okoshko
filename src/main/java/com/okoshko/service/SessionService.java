@@ -15,9 +15,10 @@ public class SessionService {
 	}
 
 	@Transactional
-	public SessionResponse open(long telegramId) {
-		SessionRepository.SessionRecord record = repository.findOrCreate(telegramId);
-		return new SessionResponse(record.roles(), record.notificationsEnabled(), record.telegramIdNoticeAcceptedAt());
+	public SessionResponse open(TelegramInitDataVerifier.TelegramUser telegramUser) {
+		SessionRepository.SessionRecord record = repository.findOrCreate(telegramUser.id());
+		return new SessionResponse(record.roles(), record.notificationsEnabled(), record.telegramIdNoticeAcceptedAt(),
+				telegramUser.firstName(), telegramUser.lastName(), telegramUser.username(), telegramUser.photoUrl());
 	}
 
 	@Transactional

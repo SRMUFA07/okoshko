@@ -37,6 +37,10 @@ public class TelegramInitDataVerifier {
 	}
 
 	public long verifyAndGetTelegramUserId(String rawInitData) {
+		return verifyAndGetTelegramUser(rawInitData).id();
+	}
+
+	public TelegramUser verifyAndGetTelegramUser(String rawInitData) {
 		if (botToken.isBlank()) {
 			throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Telegram authentication is not configured");
 		}
@@ -61,7 +65,7 @@ public class TelegramInitDataVerifier {
 		}
 
 		validateAuthDate(parameters.get("auth_date"));
-		return parseTelegramUserId(parameters.get("user"));
+		return parseTelegramUser(parameters.get("user"));
 	}
 
 	private static Map<String, String> parse(String rawInitData) {
@@ -98,14 +102,15 @@ public class TelegramInitDataVerifier {
 		}
 	}
 
-	private long parseTelegramUserId(String rawUser) {
+	private TelegramUser parseTelegramUser(String rawUser) {
 		try {
 			JsonNode user = jsonMapper.readTree(rawUser);
 			JsonNode id = user == null ? null : user.get("id");
 			if (id == null || !id.canConvertToLong() || id.longValue() <= 0) {
 				throw new TelegramInitDataException();
 			}
-			return id.longValue();
+			return new TelegramUser(id.longValue(), optionalText(user, "first_name"),
+					optionalText(user, "last_name"), optionalText(user, "username"), optionalText(user, "photo_url"));
 		}
 		catch (RuntimeException exception) {
 			if (exception instanceof TelegramInitDataException telegramException) {
@@ -114,6 +119,16 @@ public class TelegramInitDataVerifier {
 			throw new TelegramInitDataException(exception);
 		}
 	}
+
+	private static String optionalText(JsonNode user, String field) {
+		JsonNode value = user.get(field);
+		if (value == null || value.isNull()) return null;
+		if (!value.isTextual()) throw new TelegramInitDataException();
+		String text = value.textValue().trim();
+		return text.isEmpty() ? null : text;
+	}
+
+	public record TelegramUser(long id, String firstName, String lastName, String username, String photoUrl) { }
 
 	private static byte[] hmac(byte[] key, byte[] value) {
 		try {
