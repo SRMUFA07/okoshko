@@ -5,10 +5,12 @@
 <style>
 :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#19232e;background:#eef3f5;font-synthesis:none;--accent:#168c96;--muted:#687780;--line:#e6edef}*{box-sizing:border-box}body{margin:0;min-height:100vh}.shell{width:min(100%,760px);min-height:100vh;margin:auto;padding:24px 20px 48px;background:#f8fafb}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}.brand{font-size:13px;font-weight:850;letter-spacing:.11em;color:var(--accent)}a{color:inherit}.back{color:var(--accent);font-size:14px;font-weight:700;text-decoration:none}.eyebrow{margin:0 0 7px;color:#85939b;font-size:11px;font-weight:800;letter-spacing:.1em}h1{margin:0 0 8px;font-size:29px;letter-spacing:-.04em}.hint{margin:0 0 22px;color:var(--muted);font-size:14px}.card{margin:12px 0;padding:20px;border:1px solid var(--line);border-radius:22px;background:white;box-shadow:0 8px 22px #263d490d}.card h2{margin:0 0 6px;font-size:18px}.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.form{display:grid;gap:16px;margin-top:18px}.form label{display:grid;gap:7px;color:#5c6b74;font-size:12px;font-weight:750}.form input,.form textarea{width:100%;padding:13px;border:1px solid #dce5e8;border-radius:13px;background:#fff;color:#19232e;font:inherit;font-size:15px}.form textarea{min-height:100px;resize:vertical}.save{padding:14px;border:0;border-radius:999px;background:#168c96;color:white;font:inherit;font-weight:750}.notice{margin-top:18px;padding:14px;border-radius:16px;background:#edf4f5;color:#4c5e65;font-size:12px;line-height:1.5}
 </style></head><body><main class="shell"><header class="top"><span class="brand">ОКОШКО</span><a class="back" href="/app">‹ В приложение</a></header><p class="eyebrow">КАБИНЕТ УЧИТЕЛЯ</p><h1>Мои занятия</h1><p class="hint">Группы, ссылка на урок и домашние задания</p>
+<div id="workspace-content">
 <section class="card"><h2>Группа A1</h2><p>Вторник и четверг · 18:30 · начальный уровень</p><div class="form"><label>Ссылка на урок<input id="lesson-url" type="url" value="https://example.org/lesson/a1"></label><label>Домашнее задание<textarea id="homework">Workbook, Unit 4: упражнения 2, 3 и 5. Подготовить к четвергу.</textarea></label><button class="save" id="save-teacher-settings" type="button">Сохранить изменения</button><p id="save-status" class="hint" aria-live="polite"></p></div></section>
 <section class="card"><h2>Группа A2</h2><p>Понедельник и среда · 17:00 · базовый уровень</p><p style="margin-top:12px">Домашнее задание: повторить лексику Unit 3.</p></section>
 <section class="card"><h2>Расписание</h2><p>Понедельник, среда · 17:00 · группа A2</p><p style="margin-top:7px">Вторник, четверг · 18:30 · группа A1</p></section>
-<p class="notice">Режим просмотра UI · тестовые данные. Изменения формы сохраняются только в браузере.</p></main>
+</div><p class="notice" id="workspace-notice">Режим просмотра UI · тестовые данные. Изменения формы сохраняются только в браузере.</p></main>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script>
   const lessonUrl = document.querySelector("#lesson-url");
   const homework = document.querySelector("#homework");
@@ -16,8 +18,227 @@
   const saved = JSON.parse(localStorage.getItem("okoshko-teacher-preview") || "{}");
   if (saved.lessonUrl) lessonUrl.value = saved.lessonUrl;
   if (saved.homework) homework.value = saved.homework;
-  document.querySelector("#save-teacher-settings").addEventListener("click", () => {
-    localStorage.setItem("okoshko-teacher-preview", JSON.stringify({ lessonUrl: lessonUrl.value, homework: homework.value }));
-    status.textContent = "Сохранено в режиме просмотра на этом устройстве";
-  });
+  const escapeText = (value) => String(value ?? "");
+  const schoolDateParts = (value) => Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Yekaterinburg", year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+    }).formatToParts(new Date(value)).map((part) => [part.type, part.value])
+  );
+  const schoolDateTimeInput = (value) => {
+    const p = schoolDateParts(value);
+    return p.year + "-" + p.month + "-" + p.day + "T" + p.hour + ":" + p.minute;
+  };
+  const schoolDateKey = (value) => {
+    const p = schoolDateParts(value);
+    return p.year + "-" + p.month + "-" + p.day;
+  };
+  const displaySchoolDateTime = (value) => new Intl.DateTimeFormat("ru-RU", {
+    timeZone: "Asia/Yekaterinburg", dateStyle: "short", timeStyle: "short"
+  }).format(new Date(value));
+  const renderWorkspace = (groups) => {
+    const content = document.querySelector("#workspace-content");
+    content.replaceChildren();
+    if (!groups.length) {
+      const empty = document.createElement("section");
+      empty.className = "card";
+      empty.textContent = "За вами пока не закреплены группы.";
+      content.append(empty);
+      return;
+    }
+    for (const group of groups) {
+      const card = document.createElement("section");
+      card.className = "card";
+      const title = document.createElement("h2");
+      title.textContent = group.name;
+      const summary = document.createElement("p");
+      summary.textContent = [group.englishLevel, group.schedule, `Учеников: ${group.studentCount}`].filter(Boolean).join(" · ");
+      card.append(title, summary);
+      const linkText = document.createElement("p");
+      linkText.style.marginTop = "12px";
+      linkText.textContent = "Ссылка группы: ";
+      if (group.lessonLink) {
+        const link = document.createElement("a");
+        const url = new URL(group.lessonLink);
+        if (!["https:", "http:"].includes(url.protocol)) throw new Error("Недопустимая ссылка группы");
+        link.href = url.href;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = url.href;
+        linkText.append(link);
+      } else {
+        linkText.append("не задана");
+      }
+      card.append(linkText);
+      const linkForm = document.createElement("form");
+      linkForm.className = "form";
+      const linkLabel = document.createElement("label");
+      linkLabel.append("Общая ссылка подключения группы");
+      const linkInput = document.createElement("input");
+      linkInput.type = "url";
+      linkInput.required = true;
+      linkInput.maxLength = 2048;
+      linkInput.value = group.lessonLink || "";
+      linkLabel.append(linkInput);
+      const saveLink = document.createElement("button");
+      saveLink.type = "submit";
+      saveLink.className = "save";
+      saveLink.textContent = "Сохранить ссылку";
+      const linkStatus = document.createElement("p");
+      linkStatus.className = "hint";
+      linkStatus.setAttribute("aria-live", "polite");
+      linkForm.append(linkLabel, saveLink, linkStatus);
+      linkForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!webApp?.initData || !linkInput.reportValidity()) return;
+        saveLink.disabled = true;
+        linkStatus.textContent = "Сохраняем…";
+        try {
+          const response = await fetch(`/api/teacher/groups/${group.id}/lesson-link`, {
+            method: "PUT",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+              "X-Telegram-Init-Data": webApp.initData
+            },
+            body: JSON.stringify({ lessonLink: linkInput.value.trim() })
+          });
+          if (!response.ok) throw new Error(response.status === 403 ? "Нет доступа к группе" : `HTTP ${response.status}`);
+          const updated = await response.json();
+          group.lessonLink = updated.lessonLink;
+          linkText.replaceChildren("Ссылка группы: ");
+          const savedUrl = document.createElement("a");
+          savedUrl.href = updated.lessonLink;
+          savedUrl.target = "_blank";
+          savedUrl.rel = "noopener noreferrer";
+          savedUrl.textContent = updated.lessonLink;
+          linkText.append(savedUrl);
+          linkStatus.textContent = "Ссылка группы сохранена.";
+        } catch (error) {
+          linkStatus.textContent = `Не удалось сохранить ссылку (${error.message}).`;
+        } finally {
+          saveLink.disabled = false;
+        }
+      });
+      card.append(linkForm);
+      const lessonsTitle = document.createElement("h3");
+      lessonsTitle.textContent = "Занятия";
+      card.append(lessonsTitle);
+      if (!group.lessons.length) {
+        const emptyLessons = document.createElement("p");
+        emptyLessons.textContent = "Занятия пока не внесены.";
+        card.append(emptyLessons);
+      } else {
+        for (const lesson of group.lessons) {
+          const row = document.createElement("p");
+          row.textContent = `${lesson.date} · ${lesson.time}`;
+          card.append(row);
+        }
+      }
+      const homeworkTitle = document.createElement("h3");
+      homeworkTitle.textContent = "Домашние задания";
+      card.append(homeworkTitle);
+      const homeworkForms = group.homework.length ? group.homework.concat([null]) : [null];
+      homeworkForms.forEach((assignment) => {
+        const form = document.createElement("form");
+        form.className = "form";
+        const nameLabel = document.createElement("label");
+        nameLabel.append(assignment ? "Название задания" : "Новое задание · название");
+        const nameInput = document.createElement("input");
+        nameInput.type = "text";
+        nameInput.required = true;
+        nameInput.maxLength = 200;
+        nameInput.value = assignment?.name || "";
+        nameLabel.append(nameInput);
+        const descriptionLabel = document.createElement("label");
+        descriptionLabel.append("Описание задания");
+        const descriptionInput = document.createElement("textarea");
+        descriptionInput.required = true;
+        descriptionInput.value = assignment?.description || "";
+        descriptionLabel.append(descriptionInput);
+        const dueLabel = document.createElement("label");
+        dueLabel.append("Срок · время Уфы");
+        const dueInput = document.createElement("input");
+        dueInput.type = "datetime-local";
+        dueInput.required = true;
+        if (assignment?.dueDate) dueInput.value = schoolDateTimeInput(assignment.dueDate);
+        dueLabel.append(dueInput);
+        const saveHomework = document.createElement("button");
+        saveHomework.type = "submit";
+        saveHomework.className = "save";
+        saveHomework.textContent = "Сохранить домашнее задание";
+        const homeworkStatus = document.createElement("p");
+        homeworkStatus.className = "hint";
+        homeworkStatus.setAttribute("aria-live", "polite");
+        form.append(nameLabel, descriptionLabel, dueLabel, saveHomework, homeworkStatus);
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (!webApp?.initData || !form.reportValidity()) return;
+          saveHomework.disabled = true;
+          homeworkStatus.textContent = "Сохраняем…";
+          try {
+            const response = await fetch("/api/teacher/groups/" + group.id + "/homework", {
+              method: "PUT",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "X-Telegram-Init-Data": webApp.initData
+              },
+              body: JSON.stringify({
+                name: nameInput.value.trim(),
+                description: descriptionInput.value.trim(),
+                dueDate: dueInput.value
+              })
+            });
+            if (!response.ok) throw new Error(response.status === 403 ? "Нет доступа к группе" : "HTTP " + response.status);
+            const updated = await response.json();
+            const existingIndex = group.homework.findIndex((item) =>
+              schoolDateKey(item.dueDate) === schoolDateKey(updated.dueDate));
+            const savedItem = {
+              id: updated.homeworkId, name: updated.name,
+              description: updated.description, dueDate: updated.dueDate
+            };
+            if (existingIndex >= 0) group.homework[existingIndex] = savedItem;
+            else group.homework.push(savedItem);
+            group.homework.sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+            renderWorkspace(groups);
+          } catch (error) {
+            homeworkStatus.textContent = "Не удалось сохранить задание (" + error.message + ").";
+            saveHomework.disabled = false;
+          }
+        });
+        card.append(form);
+      });
+      if (group.homework.length) {
+        const assignmentSummary = document.createElement("p");
+        assignmentSummary.className = "hint";
+        assignmentSummary.textContent = group.homework.map((item) =>
+          escapeText(item.name) + " · " + displaySchoolDateTime(item.dueDate) + ": " + escapeText(item.description)
+        ).join(" | ");
+        card.append(assignmentSummary);
+      }
+      content.append(card);
+    }
+  };
+  const webApp = window.Telegram?.WebApp;
+  if (webApp?.initData) {
+    webApp.ready();
+    document.querySelector("#workspace-notice").textContent = "Данные загружаются из личного кабинета преподавателя.";
+    fetch("/api/teacher/workspace", {
+      headers: { Accept: "application/json", "X-Telegram-Init-Data": webApp.initData }
+    }).then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    }).then((data) => {
+      renderWorkspace(data.groups || []);
+      document.querySelector("#workspace-notice").textContent = "Расписание, ссылка и домашние задания загружены из базы данных.";
+    }).catch((error) => {
+      document.querySelector("#workspace-notice").textContent = `Не удалось загрузить кабинет (${error.message}). Перезапустите приложение позже.`;
+    });
+  } else {
+    document.querySelector("#save-teacher-settings").addEventListener("click", () => {
+      localStorage.setItem("okoshko-teacher-preview", JSON.stringify({ lessonUrl: lessonUrl.value, homework: homework.value }));
+      status.textContent = "Сохранено в режиме просмотра на этом устройстве";
+    });
+  }
 </script></body></html>

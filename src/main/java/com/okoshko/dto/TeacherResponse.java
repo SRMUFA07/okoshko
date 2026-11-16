@@ -14,6 +14,7 @@ public record TeacherResponse(
 			long id,
 			String name,
 			String englishLevel,
-		String schedule) {
+		String schedule,
+		long studentCount) {
 	}
 }

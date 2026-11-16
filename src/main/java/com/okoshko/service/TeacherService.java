@@ -27,7 +27,8 @@ public class TeacherService {
 
 	private static TeacherResponse toResponse(TeacherEntity teacher) {
 		List<GroupResponse> groups = teacher.groups().stream()
-				.map(group -> new GroupResponse(group.id(), group.name(), group.englishLevel(), group.schedule()))
+				.map(group -> new GroupResponse(
+						group.id(), group.name(), group.englishLevel(), group.schedule(), group.studentCount()))
 				.toList();
 		return new TeacherResponse(
 				teacher.id(),

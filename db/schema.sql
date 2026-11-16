@@ -78,6 +78,26 @@ BEGIN
       FROM public.roles
      WHERE role_id = NEW.role_id;
 
+    IF assigned_role = 'user' AND EXISTS (
+        SELECT 1
+          FROM public.user_roles ur
+         WHERE ur.user_id = NEW.user_id
+           AND (TG_OP <> 'UPDATE' OR ur.user_id <> old_user_id OR ur.role_id <> old_role_id)
+    ) THEN
+        RAISE EXCEPTION 'user role cannot be combined with other roles'
+            USING ERRCODE = 'check_violation';
+    ELSIF assigned_role IN ('student', 'admin', 'teacher') AND EXISTS (
+        SELECT 1
+          FROM public.user_roles ur
+          JOIN public.roles r USING (role_id)
+         WHERE ur.user_id = NEW.user_id
+           AND r.name = 'user'
+           AND (TG_OP <> 'UPDATE' OR ur.user_id <> old_user_id OR ur.role_id <> old_role_id)
+    ) THEN
+        RAISE EXCEPTION 'user role cannot be combined with other roles'
+            USING ERRCODE = 'check_violation';
+    END IF;
+
     IF assigned_role = 'student' AND EXISTS (
         SELECT 1
           FROM public.user_roles ur
@@ -118,7 +138,8 @@ CREATE TABLE public.groups (
     teacher_id bigint NOT NULL,
     name character varying(150) NOT NULL,
     english_level character varying(50),
-    class_schedule text
+    class_schedule text,
+    lesson_link text
 );
 
 
@@ -147,6 +168,10 @@ CREATE TABLE public.homework_assignments (
     assignment_description text NOT NULL,
     due_date timestamp with time zone NOT NULL
 );
+
+CREATE UNIQUE INDEX homework_group_due_day_uidx
+    ON public.homework_assignments
+       (group_id, ((due_date AT TIME ZONE 'Asia/Yekaterinburg')::date));
 
 
 --
@@ -206,12 +231,19 @@ CREATE TABLE public.request_groups (
 
 CREATE TABLE public.requests (
     request_id bigint NOT NULL,
-    student_id bigint NOT NULL,
+    student_id bigint,
+    applicant_user_id bigint,
+    child_first_name character varying(100),
+    child_last_name character varying(100),
+    parent_phone character varying(32),
+    consent_accepted_at timestamp with time zone,
+    consent_text_version text,
     submitted_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     status character varying(50) DEFAULT 'pending'::character varying NOT NULL,
     desired_time timestamp with time zone,
     idempotency_key uuid,
-    CONSTRAINT requests_status_allowed CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying])::text[])))
+    CONSTRAINT requests_status_allowed CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying, 'rejected'::character varying])::text[]))),
+    CONSTRAINT requests_applicant_data_complete CHECK ((applicant_user_id IS NULL) OR (child_first_name IS NOT NULL AND child_last_name IS NOT NULL AND parent_phone IS NOT NULL AND consent_accepted_at IS NOT NULL AND consent_text_version IS NOT NULL))
 );
 
 
@@ -272,6 +304,8 @@ CREATE TABLE public.students (
     age integer,
     english_level character varying(50),
     user_id bigint NOT NULL,
+    child_first_name character varying(100),
+    child_last_name character varying(100),
     CONSTRAINT students_age_check CHECK ((age > 0))
 );
 
@@ -333,11 +367,14 @@ CREATE TABLE public.user_roles (
 
 CREATE TABLE public.users (
     user_id bigint NOT NULL,
-    last_name character varying(100) NOT NULL,
-    first_name character varying(100) NOT NULL,
+    last_name character varying(100),
+    first_name character varying(100),
     patronymic character varying(100),
     telegram_id bigint,
-    notification_consent boolean DEFAULT false NOT NULL
+    notification_consent boolean DEFAULT false NOT NULL,
+    telegram_id_consent_at timestamp with time zone,
+    telegram_id_consent_version text,
+    notifications_enabled boolean DEFAULT false NOT NULL
 );
 
 
@@ -497,6 +534,8 @@ ALTER TABLE ONLY public.users
 
 CREATE UNIQUE INDEX requests_student_idempotency_key_uidx ON public.requests USING btree (student_id, idempotency_key) WHERE (idempotency_key IS NOT NULL);
 
+CREATE UNIQUE INDEX requests_applicant_idempotency_key_uidx ON public.requests USING btree (applicant_user_id, idempotency_key) WHERE (applicant_user_id IS NOT NULL AND idempotency_key IS NOT NULL);
+
 
 --
 -- Name: teachers_user_id_key; Type: INDEX; Schema: public; Owner: -
@@ -565,6 +604,9 @@ ALTER TABLE ONLY public.request_groups
 
 ALTER TABLE ONLY public.requests
     ADD CONSTRAINT requests_student_id_fkey FOREIGN KEY (student_id) REFERENCES public.students(student_id);
+
+ALTER TABLE ONLY public.requests
+    ADD CONSTRAINT requests_applicant_user_id_fkey FOREIGN KEY (applicant_user_id) REFERENCES public.users(user_id);
 
 
 --

@@ -4,5 +4,6 @@ public record TeacherGroupEntity(
 		long id,
 		String name,
 		String englishLevel,
-		String schedule) {
+		String schedule,
+		long studentCount) {
 }

@@ -1,3 +1,3 @@
 INSERT INTO public.roles (name)
-VALUES ('student'), ('admin'), ('teacher')
+VALUES ('user'), ('student'), ('admin'), ('teacher')
 ON CONFLICT (name) DO NOTHING;

@@ -25,7 +25,8 @@ public class JdbcTeacherRepository implements TeacherRepository {
 			       g.group_id,
 			       g.name AS group_name,
 			       g.english_level AS group_english_level,
-			       g.class_schedule AS group_schedule
+			       g.class_schedule AS group_schedule,
+			       (SELECT COUNT(*) FROM student_groups sg WHERE sg.group_id = g.group_id) AS group_student_count
 			  FROM teachers t
 			  JOIN users u ON u.user_id = t.user_id
 			  LEFT JOIN groups g ON g.teacher_id = t.teacher_id
@@ -75,7 +76,8 @@ public class JdbcTeacherRepository implements TeacherRepository {
 						groupId,
 						resultSet.getString("group_name"),
 						resultSet.getString("group_english_level"),
-						resultSet.getString("group_schedule")));
+						resultSet.getString("group_schedule"),
+						resultSet.getLong("group_student_count")));
 			}
 		}
 

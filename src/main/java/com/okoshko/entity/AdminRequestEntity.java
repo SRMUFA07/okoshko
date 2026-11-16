@@ -1,14 +1,13 @@
 package com.okoshko.entity;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 
 public record AdminRequestEntity(
 		long id,
-		long studentId,
+		Long studentId,
 		String studentName,
+		String parentPhone,
 		OffsetDateTime submittedAt,
 		String status,
-		OffsetDateTime desiredTime,
-		List<Long> groupIds) {
+		String groupName) {
 }

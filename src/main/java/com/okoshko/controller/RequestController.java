@@ -4,7 +4,6 @@ import com.okoshko.dto.RequestCreatedResponse;
 import com.okoshko.dto.SubmitRequestDto;
 import com.okoshko.service.RequestService;
 import com.okoshko.service.TelegramInitDataVerifier;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +36,4 @@ public class RequestController {
 		return ResponseEntity.status(response.replayed() ? HttpStatus.OK : HttpStatus.CREATED).body(response);
 	}
 
-	@GetMapping
-	public List<RequestCreatedResponse> getMine(
-			@RequestHeader(name = "X-Telegram-Init-Data", required = false) String initData) {
-		long telegramId = initDataVerifier.verifyAndGetTelegramUserId(initData);
-		return requestService.getStudentRequests(telegramId);
-	}
 }

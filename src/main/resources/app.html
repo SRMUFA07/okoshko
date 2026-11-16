@@ -114,6 +114,7 @@
     .theme-options button[aria-pressed="true"] { background: white; color: #1c3038; box-shadow: 0 1px 4px #20323c20; }
     .settings-note { padding: 4px; font-size: 12px; }
     .access-actions { display: grid; gap: 10px; margin: 18px 0 8px; }
+    .access-disabled { opacity: .4; pointer-events: none; filter: grayscale(1); }
     .access-button { display: flex; justify-content: space-between; align-items: center; padding: 17px; border: 1px solid #e6ecee; border-radius: 18px; background: white; color: inherit; font-weight: 700; text-decoration: none; box-shadow: 0 7px 20px #1b2a350d; }
     .access-button span:last-child { color: var(--accent); font-size: 22px; }
     .device.theme-dark { background: #151b20; color: #f1f4f5; --line: #303a40; --muted: #b4bec4; --accent: #77d6dd; }
@@ -164,6 +165,7 @@
     }
     .nav-item { display: grid; justify-items: center; align-content: center; gap: 3px; min-width: 0; min-height: 68px; padding: 6px 3px; border: 0; border-radius: 999px; background: transparent; color: #27313a; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: background-color .2s ease, color .2s ease, transform .16s ease; }
     .nav-item.active { color: #30aeb8; background: #e7f6f7; }
+    .nav-item:disabled { opacity: .38; cursor: not-allowed; filter: grayscale(1); }
     .theme-dark .bottom-nav { border-color: #36434a; background: #20282e; box-shadow: 0 6px 22px #0005; }
     .theme-dark .nav-item { color: #d0d8dc; }
     .theme-dark .nav-item.active { color: #9ce3e7; background: #2d484c; }
@@ -194,9 +196,7 @@
         <section class="catalog" id="catalog">
           <h1>Каталог учителей</h1>
           <div class="teacher-list" id="teacher-list" aria-label="Учителя">
-            <button class="teacher-card" type="button" data-teacher="0"><span class="avatar" aria-hidden="true"></span><span><span class="teacher-name">Анна Смирнова</span><span class="teacher-subtitle">Индивидуально и в группе</span><span class="teacher-tags">Онлайн · Английский</span></span><span class="chevron" aria-hidden="true">›</span></button>
-            <button class="teacher-card" type="button" data-teacher="1"><span class="avatar" aria-hidden="true"></span><span><span class="teacher-name">Елена Иванова</span><span class="teacher-subtitle">Английский для школьников</span><span class="teacher-tags">Онлайн · Английский</span></span><span class="chevron" aria-hidden="true">›</span></button>
-            <button class="teacher-card" type="button" data-teacher="2"><span class="avatar" aria-hidden="true"></span><span><span class="teacher-name">Мария Петрова</span><span class="teacher-subtitle">Разговорная практика</span><span class="teacher-tags">Онлайн · Английский</span></span><span class="chevron" aria-hidden="true">›</span></button>
+            <p class="state-message" role="status">Загружаем каталог…</p>
           </div>
         </section>
         <section class="profile" id="profile" aria-live="polite" hidden>
@@ -207,8 +207,9 @@
         </section>
       </section>
       <section class="view" id="account-view" hidden>
-        <p class="section-kicker">УЧЕНИК · ДЕМО-ПРОФИЛЬ</p>
+        <p class="section-kicker">ЛИЧНЫЙ КАБИНЕТ</p>
         <h1 class="page-title">Мой дневник</h1>
+        <div id="diary-data">
         <article class="surface-card lesson-card">
           <p class="section-kicker">СЛЕДУЮЩИЙ УРОК</p>
           <h2>Английский · группа A1</h2>
@@ -226,22 +227,26 @@
           <h2>Расписание</h2>
           <div class="schedule-list"><div class="schedule-row"><strong>Вторник</strong><span>18:30 · группа A1</span></div><div class="schedule-row"><strong>Четверг</strong><span>18:30 · группа A1</span></div></div>
         </article>
+        </div>
       </section>
       <section class="view" id="settings-view" hidden>
         <p class="section-kicker">ПРИЛОЖЕНИЕ</p>
         <h1 class="page-title">Настройки</h1>
         <article class="surface-card settings-card">
-          <div class="setting-row"><div><h2>Уведомления</h2><p>Получать уведомления приложения</p></div><label class="switch"><input id="notifications-setting" type="checkbox" checked><span></span><b class="sr-only">Уведомления</b></label></div>
+          <div class="setting-row"><div><h2>Уведомления</h2><p>Напоминания о занятиях в Telegram</p></div><label class="switch"><input id="notifications-setting" type="checkbox"><span></span><b class="sr-only">Уведомления о занятиях</b></label></div>
           <div class="setting-row"><div><h2>Контрастные цвета</h2><p>Усилить различия текста и элементов</p></div><label class="switch"><input id="contrast-setting" type="checkbox"><span></span><b class="sr-only">Контрастные цвета</b></label></div>
           <div class="setting-row setting-theme"><div><h2>Тема</h2><p>Выберите оформление приложения</p></div><div class="theme-options" role="group" aria-label="Цветовая тема"><button type="button" data-theme="light" aria-pressed="true">Светлая</button><button type="button" data-theme="dark" aria-pressed="false">Тёмная</button></div></div>
         </article>
-        <p class="state-message settings-note">Настройки сохраняются в этом браузере на этом устройстве. В режиме предпросмотра кабинеты открываются с тестовыми данными; изменения в них не попадут на сервер.</p>
-        <div class="access-actions"><a class="access-button" href="/admin?preview=1"><span>Войти как администратор</span><span aria-hidden="true">›</span></a><a class="access-button" href="/teacher?preview=1"><span>Войти как учитель</span><span aria-hidden="true">›</span></a></div>
+        <p class="state-message settings-note">Тема и контрастность сохраняются на этом устройстве; настройка Telegram-напоминаний — в аккаунте.</p>
+        <p id="settings-status" class="save-status" aria-live="polite"></p>
+        <div class="access-actions"><a class="access-button access-disabled" aria-disabled="true" data-required-role="admin" href="/admin"><span>Войти как администратор</span><span aria-hidden="true">›</span></a><a class="access-button access-disabled" aria-disabled="true" data-required-role="teacher" href="/teacher"><span>Войти как учитель</span><span aria-hidden="true">›</span></a></div>
       </section>
       <section class="view" id="request-view" hidden>
         <button class="request-back" type="button" id="request-back">‹ Назад к преподавателю</button>
-        <p class="section-kicker">ДЕМО-ФОРМА</p>
+        <p class="section-kicker">ЗАПИСЬ В ГРУППУ</p>
         <h1 class="page-title">Заявка на запись</h1>
+        <p class="request-result" id="selected-group-label" aria-live="polite"></p>
+        <p class="request-result">Заявка, личный кабинет и напоминания будут привязаны к Telegram-аккаунту, из которого открыто приложение. Если уведомления должен получать ученик, отправьте заявку из его Telegram-аккаунта.</p>
         <form class="request-form" id="booking-form">
           <label>Имя ребёнка<input name="childFirstName" type="text" required></label>
           <label>Фамилия ребёнка<input name="childLastName" type="text" required></label>
@@ -257,25 +262,20 @@
     </main>
     <nav class="bottom-nav" aria-label="Основная навигация">
       <button class="nav-item active" type="button" data-section="teachers" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 17 11.8-11.8a2.1 2.1 0 0 1 3 3L7 20l-4 1z"/><path d="M3 21h18"/></svg><span>Учителя</span></button>
-      <button class="nav-item" type="button" data-section="account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Личный кабинет</span></button>
-      <button class="nav-item" type="button" data-section="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 1.72l-.12.88a2 2 0 0 1-1.05 1.44l-.78.44a2 2 0 0 1-1.8.04l-.75-.38a2 2 0 0 0-2.58.92l-.22.38a2 2 0 0 0 .52 2.7l.71.53a2 2 0 0 1 .8 1.67v.9a2 2 0 0 1-.8 1.66l-.71.53a2 2 0 0 0-.52 2.7l.22.38a2 2 0 0 0 2.58.92l.75-.38a2 2 0 0 1 1.8.04l.78.44a2 2 0 0 1 1.05 1.44l.12.88A2 2 0 0 0 11.78 22h.44a2 2 0 0 0 2-1.72l.12-.88a2 2 0 0 1 1.05-1.44l.78-.44a2 2 0 0 1 1.8-.04l.75.38a2 2 0 0 0 2.58-.92l.22-.38a2 2 0 0 0-.52-2.7l-.71-.53a2 2 0 0 1-.8-1.67v-.9a2 2 0 0 1 .8-1.66l.71-.53a2 2 0 0 0 .52-2.7l-.22-.38a2 2 0 0 0-2.58-.92l-.75.38a2 2 0 0 1-1.8-.04l-.78-.44a2 2 0 0 1-1.05-1.44l-.12-.88A2 2 0 0 0 12.22 2Z"/><circle cx="12" cy="12" r="3"/></svg><span>Настройки</span></button>
+      <button class="nav-item" type="button" data-section="account" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Личный кабинет</span></button>
+      <button class="nav-item" type="button" data-section="settings" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 1.72l-.12.88a2 2 0 0 1-1.05 1.44l-.78.44a2 2 0 0 1-1.8.04l-.75-.38a2 2 0 0 0-2.58.92l-.22.38a2 2 0 0 0 .52 2.7l.71.53a2 2 0 0 1 .8 1.67v.9a2 2 0 0 1-.8 1.66l-.71.53a2 2 0 0 0-.52 2.7l.22.38a2 2 0 0 0 2.58.92l.75-.38a2 2 0 0 1 1.8.04l.78.44a2 2 0 0 1 1.05 1.44l.12.88A2 2 0 0 0 11.78 22h.44a2 2 0 0 0 2-1.72l.12-.88a2 2 0 0 1 1.05-1.44l.78-.44a2 2 0 0 1 1.8-.04l.75.38a2 2 0 0 0 2.58-.92l.22-.38a2 2 0 0 0-.52-2.7l-.71-.53a2 2 0 0 1-.8-1.67v-.9a2 2 0 0 1 .8-1.66l.71-.53a2 2 0 0 0 .52-2.7l-.22-.38a2 2 0 0 0-2.58-.92l-.75.38a2 2 0 0 1-1.8-.04l-.78-.44a2 2 0 0 1-1.05-1.44l-.12-.88A2 2 0 0 0 12.22 2Z"/><circle cx="12" cy="12" r="3"/></svg><span>Настройки</span></button>
     </nav>
   </div>
   <script>
-    const demoTeachers = [
-      { name: "Анна Смирнова", description: "Помогаю детям уверенно говорить по-английски.", experience: "5 лет", groups: [
-        { id: 101, name: "Группа A1", level: "A1 · начальный", days: "Вторник, четверг", time: "18:30", students: 6 },
-        { id: 102, name: "Группа A2", level: "A2 · базовый", days: "Понедельник, среда", time: "17:00", students: 5 }
-      ] },
-      { name: "Елена Иванова", description: "Английский для школьников: практика и грамматика.", experience: "7 лет", groups: [
-        { id: 201, name: "Группа A1", level: "A1 · начальный", days: "Понедельник, среда", time: "18:00", students: 4 }
-      ] },
-      { name: "Мария Петрова", description: "Разговорная практика в небольших группах.", experience: "3 года", groups: [
-        { id: 301, name: "Группа A2", level: "A2 · базовый", days: "Вторник, пятница", time: "19:00", students: 6 }
-      ] }
-    ];
+    let teachers = [];
     let activeTeacher = null;
-    let selectedDemoGroupId = null;
+    let selectedGroupId = null;
+    let bookingIdempotencyKey = null;
+    let bookingPayloadSignature = null;
+    let bookingSubmissionSucceeded = false;
+    const webApp = window.Telegram?.WebApp;
+    const initData = webApp?.initData || "";
+    let currentRoles = new Set();
     const views = {
       teachers: document.querySelector("#teachers-view"),
       account: document.querySelector("#account-view"),
@@ -284,23 +284,81 @@
     };
     const profile = document.querySelector("#profile");
     const catalog = document.querySelector("#catalog");
-    document.querySelectorAll(".teacher-card").forEach((card) => card.addEventListener("click", () => {
-      activeTeacher = demoTeachers[Number(card.dataset.teacher)];
+    const teacherList = document.querySelector("#teacher-list");
+    const teacherById = (id) => teachers.find((teacher) => teacher.id === Number(id));
+    const renderTeacherList = () => {
+      if (!teachers.length) {
+        teacherList.innerHTML = '<p class="state-message">Преподаватели пока не добавлены.</p>';
+        return;
+      }
+      teacherList.replaceChildren(...teachers.map((teacher) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "teacher-card";
+        button.dataset.teacherId = String(teacher.id);
+        const avatar = document.createElement("span");
+        avatar.className = "avatar";
+        avatar.setAttribute("aria-hidden", "true");
+        const details = document.createElement("span");
+        const name = document.createElement("span");
+        name.className = "teacher-name";
+        name.textContent = [teacher.firstName, teacher.lastName].filter(Boolean).join(" ");
+        const subtitle = document.createElement("span");
+        subtitle.className = "teacher-subtitle";
+        subtitle.textContent = "Преподаватель английского";
+        const tags = document.createElement("span");
+        tags.className = "teacher-tags";
+        tags.textContent = "Онлайн · Английский";
+        details.append(name, subtitle, tags);
+        const chevron = document.createElement("span");
+        chevron.className = "chevron";
+        chevron.setAttribute("aria-hidden", "true");
+        chevron.textContent = "›";
+        button.append(avatar, details, chevron);
+        return button;
+      }));
+    };
+    const loadTeachers = async () => {
+      teacherList.innerHTML = '<p class="state-message" role="status">Загружаем каталог…</p>';
+      try {
+        const response = await fetch("/api/teachers", { headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        teachers = await response.json();
+        renderTeacherList();
+      } catch (error) {
+        teacherList.replaceChildren();
+        const message = document.createElement("p");
+        message.className = "state-message";
+        message.textContent = `Не удалось загрузить каталог (${error.message}).`;
+        const retry = document.createElement("button");
+        retry.className = "retry";
+        retry.type = "button";
+        retry.textContent = "Повторить";
+        retry.addEventListener("click", loadTeachers);
+        teacherList.append(message, retry);
+      }
+    };
+    teacherList.addEventListener("click", (event) => {
+      const card = event.target.closest(".teacher-card");
+      if (!card) return;
+      activeTeacher = teacherById(card.dataset.teacherId);
+      if (!activeTeacher) return;
       const teacher = activeTeacher;
-      document.querySelector("#profile-name").textContent = teacher.name;
+      document.querySelector("#profile-name").textContent = [teacher.firstName, teacher.lastName].filter(Boolean).join(" ");
       document.querySelector("#profile-description").textContent = teacher.description;
-      document.querySelector("#profile-experience").textContent = teacher.experience;
+      document.querySelector("#profile-experience").textContent = teacher.experienceYears == null
+        ? "Стаж не указан"
+        : `${teacher.experienceYears} лет`;
       const groups = document.querySelector("#profile-groups");
-      groups.replaceChildren(...teacher.groups.map((group) => {
+      groups.replaceChildren(...(teacher.groups || []).map((group) => {
         const card = document.createElement("article");
         card.className = "group-card";
         const title = document.createElement("h3");
         title.textContent = group.name;
         const details = [
-          ["Уровень языка", group.level],
-          ["Дни недели", group.days],
-          ["Время", group.time],
-          ["Участников", String(group.students)]
+          ["Уровень языка", group.englishLevel || "Не указан"],
+          ["Расписание", group.schedule || "Не указано"],
+          ["Участников", String(group.studentCount ?? 0)]
         ];
         card.append(title, ...details.map(([label, value]) => {
           const row = document.createElement("div");
@@ -321,9 +379,13 @@
       catalog.hidden = true;
       profile.hidden = false;
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }));
+    });
     const openBookingForm = (selectedGroup) => {
-      selectedDemoGroupId = selectedGroup.id;
+      selectedGroupId = selectedGroup.id;
+      bookingIdempotencyKey = null;
+      bookingPayloadSignature = null;
+      bookingSubmissionSucceeded = false;
+      document.querySelector("#selected-group-label").textContent = `Выбранная группа: ${selectedGroup.name}`;
       document.querySelector("#personal-data-consent").checked = false;
       document.querySelector("#request-result").textContent = "";
       document.querySelector("#booking-form").reset();
@@ -356,7 +418,7 @@
       contrast: document.querySelector("#contrast-setting")
     };
     const savedSettings = JSON.parse(localStorage.getItem("okoshko-settings") || "{}");
-    settings.notifications.checked = savedSettings.notifications ?? true;
+    settings.notifications.checked = savedSettings.notifications ?? false;
     settings.contrast.checked = savedSettings.contrast ?? false;
     const applySettings = () => {
       device.classList.toggle("high-contrast", settings.contrast.checked);
@@ -370,7 +432,25 @@
       Object.assign(savedSettings, { theme });
       applySettings();
     };
-    settings.notifications.addEventListener("change", saveSettings);
+    settings.notifications.addEventListener("change", async () => {
+      saveSettings();
+      if (!initData || !currentRoles.has("student")) return;
+      const feedback = document.querySelector("#settings-status");
+      try {
+        const response = await fetch("/api/session/notifications", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", "X-Telegram-Init-Data": initData },
+          body: JSON.stringify({ enabled: settings.notifications.checked })
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        serverNotificationsEnabled = settings.notifications.checked;
+        feedback.textContent = "Настройка напоминаний сохранена.";
+      } catch (error) {
+        settings.notifications.checked = serverNotificationsEnabled;
+        saveSettings();
+        feedback.textContent = `Не удалось сохранить настройку (${error.message}).`;
+      }
+    });
     settings.contrast.addEventListener("change", saveSettings);
     document.querySelectorAll("[data-theme]").forEach((button) => button.addEventListener("click", () => {
       document.querySelectorAll("[data-theme]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
@@ -384,13 +464,153 @@
     document.querySelector("#join-lesson").addEventListener("click", () => {
       document.querySelector("#join-status").textContent = "В демо-режиме переход к уроку не выполняется";
     });
-    document.querySelector("#booking-form").addEventListener("submit", (event) => {
+    document.querySelector("#booking-form").addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!event.currentTarget.reportValidity()) return;
-      document.querySelector("#request-result").textContent = selectedDemoGroupId
-        ? "Демо-заявка заполнена. На сервер она не отправлена."
-        : "Сначала выберите группу преподавателя.";
+      const feedback = document.querySelector("#request-result");
+      const submitButton = event.currentTarget.querySelector('[type="submit"]');
+      if (!selectedGroupId) { feedback.textContent = "Сначала выберите группу преподавателя."; return; }
+      if (!initData) { feedback.textContent = "Отправка заявки доступна при открытии приложения в Telegram."; return; }
+      const form = new FormData(event.currentTarget);
+      const payload = {
+        groupId: selectedGroupId,
+        childFirstName: String(form.get("childFirstName") || "").trim(),
+        childLastName: String(form.get("childLastName") || "").trim(),
+        parentPhone: String(form.get("parentPhone") || "").trim(),
+        personalDataConsent: form.get("personalDataConsent") === "on"
+      };
+      const payloadSignature = JSON.stringify(payload);
+      if (payloadSignature !== bookingPayloadSignature) {
+        bookingPayloadSignature = payloadSignature;
+        bookingIdempotencyKey = crypto.randomUUID();
+      }
+      submitButton.disabled = true;
+      feedback.textContent = "Отправляем заявку…";
+      try {
+        const sessionResponse = await fetch("/api/session", {
+          method: "POST", headers: { "X-Telegram-Init-Data": initData }
+        });
+        if (!sessionResponse.ok) throw new Error("Не удалось проверить Telegram-аккаунт.");
+        const response = await fetch("/api/requests", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", Accept: "application/json",
+            "X-Telegram-Init-Data": initData, "Idempotency-Key": bookingIdempotencyKey
+          },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.detail || result.message || `Ошибка отправки (${response.status}).`);
+        feedback.textContent = "Заявка отправлена. После одобрения администратора откроется личный кабинет ученика.";
+        event.currentTarget.reset();
+        bookingSubmissionSucceeded = true;
+        submitButton.textContent = "Заявка отправлена";
+        bookingIdempotencyKey = null;
+      } catch (error) {
+        feedback.textContent = error.message || "Не удалось отправить заявку. Попробуйте ещё раз.";
+      } finally { submitButton.disabled = bookingSubmissionSucceeded; }
     });
+    const accessActions = document.querySelector(".access-actions");
+    const setAccess = (roles) => {
+      currentRoles = new Set(roles);
+      const student = currentRoles.has("student");
+      const privileged = currentRoles.has("admin") || currentRoles.has("teacher");
+      document.querySelector('[data-section="account"]').disabled = !student;
+      document.querySelector('[data-section="settings"]').disabled = !(student || privileged);
+      settings.notifications.disabled = !student;
+      for (const link of accessActions.querySelectorAll("[data-required-role]")) {
+        const allowed = currentRoles.has(link.dataset.requiredRole);
+        link.classList.toggle("access-disabled", !allowed);
+        link.setAttribute("aria-disabled", String(!allowed));
+        link.onclick = allowed ? null : (event) => event.preventDefault();
+      }
+    };
+    const renderDiary = (groups) => {
+      const diary = document.querySelector("#diary-data");
+      diary.replaceChildren();
+      if (!groups.length) {
+        const empty = document.createElement("p");
+        empty.className = "state-message";
+        empty.textContent = "К группе пока не зачислены. Обратитесь к администратору после решения по заявке.";
+        diary.append(empty);
+        return;
+      }
+      for (const group of groups) {
+        const card = document.createElement("article");
+        card.className = "surface-card";
+        const heading = document.createElement("h2");
+        heading.textContent = group.name;
+        const schedule = document.createElement("p");
+        schedule.textContent = group.schedule || "Расписание уточняется";
+        card.append(heading, schedule);
+        if (group.lessonLink) {
+          const link = document.createElement("a");
+          const url = new URL(group.lessonLink);
+          if (!["http:", "https:"].includes(url.protocol)) throw new Error("Недопустимая ссылка подключения");
+          link.href = url.href;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.className = "lesson-button";
+          link.textContent = "Подключиться к уроку";
+          card.append(link);
+        }
+        const lessonsHeading = document.createElement("h3");
+        lessonsHeading.textContent = "Занятия";
+        card.append(lessonsHeading);
+        for (const lesson of group.lessons || []) {
+          const row = document.createElement("p");
+          row.textContent = `${lesson.date} · ${lesson.time}`;
+          card.append(row);
+        }
+        const homeworkHeading = document.createElement("h3");
+        homeworkHeading.textContent = "Домашние задания";
+        card.append(homeworkHeading);
+        for (const assignment of group.homework || []) {
+          const item = document.createElement("p");
+          item.textContent = `${assignment.name} · срок ${new Date(assignment.dueDate).toLocaleString("ru-RU")}: ${assignment.description}`;
+          card.append(item);
+        }
+        diary.append(card);
+      }
+    };
+    let serverNotificationsEnabled = false;
+    const loadSession = async () => {
+      if (!initData) return;
+      webApp.ready();
+      try {
+        const response = await fetch("/api/session", {
+          method: "POST",
+          headers: { Accept: "application/json", "X-Telegram-Init-Data": initData }
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const session = await response.json();
+        setAccess(session.roles || []);
+        serverNotificationsEnabled = Boolean(session.notificationsEnabled);
+        settings.notifications.checked = serverNotificationsEnabled;
+        if (currentRoles.has("student")) {
+          const diaryResponse = await fetch("/api/student/diary", {
+            headers: { Accept: "application/json", "X-Telegram-Init-Data": initData }
+          });
+          if (!diaryResponse.ok) throw new Error(`HTTP ${diaryResponse.status}`);
+          renderDiary((await diaryResponse.json()).groups || []);
+        }
+      } catch (error) {
+        setAccess([]);
+        document.querySelector("#settings-status").textContent = `Не удалось проверить доступ (${error.message}).`;
+      }
+    };
+    if (initData) {
+      setAccess([]);
+    } else {
+      document.querySelectorAll(".nav-item").forEach((item) => { item.disabled = false; });
+      settings.notifications.disabled = false;
+      for (const link of accessActions.querySelectorAll("[data-required-role]")) {
+        link.classList.remove("access-disabled");
+        link.removeAttribute("aria-disabled");
+      }
+    }
+    loadTeachers();
+    loadSession();
   </script>
 </body>
 </html>

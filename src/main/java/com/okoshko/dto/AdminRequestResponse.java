@@ -1,15 +1,13 @@
 package com.okoshko.dto;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.List;
 
 public record AdminRequestResponse(
 		long requestId,
-		long studentId,
+		Long studentId,
 		String studentName,
+		String parentPhone,
 		OffsetDateTime submittedAt,
 		String status,
-		LocalDateTime desiredDateTime,
-		List<Long> groupIds) {
+		String groupName) {
 }

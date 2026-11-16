@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class TelegramBotPollingService implements SmartLifecycle {
 
     private static final Logger log = LoggerFactory.getLogger(TelegramBotPollingService.class);
-    private static final String START_MESSAGE = "Привет! Это бот приложения «Окошко» для учеников и преподавателей онлайн-школы английского. Откройте приложение кнопкой меню, чтобы посмотреть доступные разделы.";
+    private static final String START_MESSAGE = "Привет! Это бот приложения «Окошко» для учеников и преподавателей онлайн-школы английского. При использовании бота вы соглашаетесь на сохранение вашего Telegram ID (это нужно для корректной работы личного дневника). Откройте приложение кнопкой меню, чтобы посмотреть доступные разделы.";
     private static final Duration POLL_TIMEOUT = Duration.ofSeconds(35);
 
     private final String botToken;

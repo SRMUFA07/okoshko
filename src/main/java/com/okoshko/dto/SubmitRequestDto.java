@@ -1,7 +1,9 @@
 package com.okoshko.dto;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-public record SubmitRequestDto(List<Long> groupIds, LocalDateTime desiredDateTime) {
+public record SubmitRequestDto(
+		Long groupId,
+		String childFirstName,
+		String childLastName,
+		String parentPhone,
+		Boolean personalDataConsent) {
 }
